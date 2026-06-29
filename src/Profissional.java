@@ -1,42 +1,37 @@
-public class Profissional {
-    public String nome;
-    public String especialidade;
-    public String registroProfissional;
-    public double valorConsulta;
-    public String[] diasDisponiveis;
-    public int totalDias;
+import java.util.ArrayList;
+import java.util.List;
 
-    // so nome e especialidade
-    public Profissional(String nome, String especialidade) {
-        this.nome = nome;
+public abstract class Profissional extends Pessoa {
+    private String especialidade;
+    private String registroProfissional;
+    private double valorConsulta;
+    private List<String> diasDisponiveis;
+
+    // cadastro inicial do medico e sua especialidade para ficar melhor de saber sua funcao
+    public Profissional(String nome, String cpf, String especialidade) {
+        super(nome, cpf);
         this.especialidade = especialidade;
         this.registroProfissional = "";
         this.valorConsulta = 0;
-        this.diasDisponiveis = new String[7];
-        this.totalDias = 0;
+        this.diasDisponiveis = new ArrayList<>();
     }
 
-    public Profissional(String nome, String especialidade, String registroProfissional, double valorConsulta) {
-        this.nome = nome;
+    // SOBRECARGA: mesmo nome porem com parametros diferentes
+    public Profissional(String nome, String cpf, String especialidade,
+                        String registroProfissional, double valorConsulta) {
+        super(nome, cpf);
         this.especialidade = especialidade;
         this.registroProfissional = registroProfissional;
         this.valorConsulta = valorConsulta;
-        this.diasDisponiveis = new String[7];
-        this.totalDias = 0;
+        this.diasDisponiveis = new ArrayList<>();
     }
 
-    // construtor completo com dias
-    public Profissional(String nome, String especialidade, String registroProfissional,
-                        double valorConsulta, String[] dias, int totalDias) {
-        this.nome = nome;
-        this.especialidade = especialidade;
-        this.registroProfissional = registroProfissional;
-        this.valorConsulta = valorConsulta;
-        this.diasDisponiveis = new String[7];
-        this.totalDias = totalDias;
-        for (int i = 0; i < totalDias; i++) {
-            this.diasDisponiveis[i] = dias[i];
-        }
+    // cada 1 especialidade vai ter que implementar esse metodo
+    public abstract void registrarEspecifico(Atendimento atendimento);
+
+    // so as subclasses conseguem acessar isso
+    protected double getValorBase() {
+        return this.valorConsulta;
     }
 
     public void atualizar(String registro, double valor) {
@@ -44,19 +39,17 @@ public class Profissional {
         this.valorConsulta = valor;
     }
 
-    public void atualizar(String registro, double valor, String[] dias, int totalDias) {
+    // SOBRECARGA: tem mesmo nome mais com parametros diferentes
+    public void atualizar(String registro, double valor, List<String> dias) {
         this.registroProfissional = registro;
         this.valorConsulta = valor;
-        this.totalDias = totalDias;
-        for (int i = 0; i < totalDias; i++) {
-            this.diasDisponiveis[i] = dias[i];
-        }
+        this.diasDisponiveis = dias;
     }
 
-    // verifica se o profissional atende naquele dia
+    // verifica se o medico atende no dia da consulta
     public boolean atendeNoDia(String dia) {
-        for (int i = 0; i < totalDias; i++) {
-            if (diasDisponiveis[i].equals(dia)) {
+        for (int i = 0; i < diasDisponiveis.size(); i++) {
+            if (diasDisponiveis.get(i).equals(dia)) {
                 return true;
             }
         }
@@ -72,13 +65,41 @@ public class Profissional {
         return false;
     }
 
-    public String exibirResumo() {
-        String dias = "";
-        for (int i = 0; i < totalDias; i++) {
-            if (i > 0) dias = dias + ", ";
-            dias = dias + diasDisponiveis[i];
+    // junta os dias em uma string so pra mostrar
+    public String getDiasFormatado() {
+        String resultado = "";
+        for (int i = 0; i < diasDisponiveis.size(); i++) {
+            if (i > 0) resultado = resultado + ", ";
+            resultado = resultado + diasDisponiveis.get(i);
         }
-        return "Nome: " + nome + " | Espec: " + especialidade + " | Reg: " + registroProfissional
-                + " | Valor: R$" + valorConsulta + " | Dias: " + dias;
+        return resultado;
+    }
+
+    public void adicionarDia(String dia) {
+        diasDisponiveis.add(dia);
+    }
+
+    public String getEspecialidade() {
+        return especialidade;
+    }
+
+    public String getRegistroProfissional() {
+        return registroProfissional;
+    }
+
+    public void setRegistroProfissional(String reg) {
+        this.registroProfissional = reg;
+    }
+
+    public double getValorConsulta() {
+        return valorConsulta;
+    }
+
+    public void setValorConsulta(double valor) {
+        this.valorConsulta = valor;
+    }
+
+    public List<String> getDiasDisponiveis() {
+        return diasDisponiveis;
     }
 }
