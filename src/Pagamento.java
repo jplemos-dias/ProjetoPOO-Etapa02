@@ -1,58 +1,33 @@
-public class Pagamento {
-    public int indiceConsulta;
-    public double valorFinal;
-    public String tipoPagamento;
-    public int parcelas;
+public abstract class Pagamento implements Exportavel {
+    private double valorBase;
+    private Consulta consulta;
 
-    public Pagamento(int indiceConsulta, double valorFinal, String tipoPagamento) {
-        this.indiceConsulta = indiceConsulta;
-        this.valorFinal = valorFinal;
-        this.tipoPagamento = tipoPagamento;
-        this.parcelas = 1;
+    public Pagamento(Consulta consulta, double valorBase) {
+        this.consulta = consulta;
+        this.valorBase = valorBase;
     }
 
-    // com parcelas (so pra cartao)
-    public Pagamento(int indiceConsulta, double valorFinal, String tipoPagamento, int parcelas) {
-        this.indiceConsulta = indiceConsulta;
-        this.valorFinal = valorFinal;
-        this.tipoPagamento = tipoPagamento;
-        this.parcelas = parcelas;
-    }
+    // metodo abstrato cada forma de pagamento calcula diferente uma da outa
+    public abstract double calcularValorFinal();
 
-    // sem desconto nenhum
-    public static double calcularValor(double valorBase) {
-        return valorBase;
-    }
-
-    // com desconto em percentual
-    public static double calcularValor(double valorBase, double percentualDesconto) {
-        double desconto = valorBase * percentualDesconto / 100;
-        double valor = valorBase - desconto;
-        if (valor < 0) {
-            valor = 0;
-        }
-        return valor;
-    }
-
-    // com desconto e multa somada
-    public static double calcularValor(double valorBase, double percentualDesconto, double multa) {
-        double desconto = valorBase * percentualDesconto / 100;
-        double valor = valorBase - desconto + multa;
-        if (valor < 0) {
-            valor = 0;
-        }
-        return valor;
+    @Override
+    public String exportarDados() {
+        double valorFinal = Math.round(calcularValorFinal() * 100.0) / 100.0;
+        return "Pagamento | CPF: " + consulta.getCpfPaciente()
+                + " | Valor: R$" + valorFinal;
     }
 
     public String exibirResumo() {
-        // arredonda pra 2 casas
-        double valorArredondado = Math.round(valorFinal * 100.0) / 100.0;
-        String resumo = "Consulta #" + indiceConsulta + " | Valor: R$" + valorArredondado
-                + " | Tipo: " + tipoPagamento + " | Parcelas: " + parcelas;
-        if (parcelas > 1) {
-            double valorParcela = Math.round((valorFinal / parcelas) * 100.0) / 100.0;
-            resumo = resumo + " (R$" + valorParcela + " cada)";
-        }
-        return resumo;
+        double valorFinal = Math.round(calcularValorFinal() * 100.0) / 100.0;
+        return "CPF: " + consulta.getCpfPaciente()
+                + " | Valor final: R$" + valorFinal;
+    }
+
+    public double getValorBase() {
+        return valorBase;
+    }
+
+    public Consulta getConsulta() {
+        return consulta;
     }
 }

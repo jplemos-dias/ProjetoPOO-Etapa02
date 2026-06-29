@@ -1,74 +1,48 @@
-public class Atendimento {
-    public int indiceConsulta;
-    public String observacoes;
-    public String diagnostico;
-    public String[] procedimentos;
-    public int totalProcedimentos;
+public class Atendimento implements Exportavel {
+    private Consulta consulta;
+    // COMPOSICAO: prontuario so existe dentro de atendimento
+    private Prontuario prontuario;
 
-    // registro basico - so observacoes
-    public Atendimento(int indiceConsulta, String observacoes) {
-        this.indiceConsulta = indiceConsulta;
-        this.observacoes = observacoes;
-        this.diagnostico = "";
-        this.procedimentos = new String[10];
-        this.totalProcedimentos = 0;
+    public Atendimento(Consulta consulta, String dataRegistro) {
+        this.consulta = consulta;
+        this.prontuario = new Prontuario(dataRegistro);
     }
 
-    public Atendimento(int indiceConsulta, String observacoes, String diagnostico) {
-        this.indiceConsulta = indiceConsulta;
-        this.observacoes = observacoes;
-        this.diagnostico = diagnostico;
-        this.procedimentos = new String[10];
-        this.totalProcedimentos = 0;
+    // SOBRECARGA: mesmo nome mais com parametros diferentes
+    public Atendimento(Consulta consulta, String dataRegistro, String observacoes) {
+        this.consulta = consulta;
+        this.prontuario = new Prontuario(dataRegistro);
+        this.prontuario.setObservacoes(observacoes);
     }
 
-    // registro completo com procedimentos ja definidos
-    public Atendimento(int indiceConsulta, String observacoes, String diagnostico,
-                       String[] procedimentos, int totalProcedimentos) {
-        this.indiceConsulta = indiceConsulta;
-        this.observacoes = observacoes;
-        this.diagnostico = diagnostico;
-        this.procedimentos = new String[10];
-        this.totalProcedimentos = totalProcedimentos;
-        for (int i = 0; i < totalProcedimentos; i++) {
-            this.procedimentos[i] = procedimentos[i];
-        }
+    public Atendimento(Consulta consulta, String dataRegistro, String observacoes, String diagnostico) {
+        this.consulta = consulta;
+        this.prontuario = new Prontuario(dataRegistro);
+        this.prontuario.setObservacoes(observacoes);
+        this.prontuario.setDiagnostico(diagnostico);
     }
 
-    // adiciona um por vez
     public void adicionarProcedimento(String procedimento) {
-        if (totalProcedimentos < 10) {
-            procedimentos[totalProcedimentos] = procedimento;
-            totalProcedimentos++;
-        }
+        prontuario.adicionarProcedimento(procedimento);
     }
 
-    // adiciona varios de uma vez
-    public void adicionarProcedimento(String[] procs, int quantidade) {
-        for (int i = 0; i < quantidade; i++) {
-            if (totalProcedimentos < 10) {
-                procedimentos[totalProcedimentos] = procs[i];
-                totalProcedimentos++;
-            }
-        }
+    public Consulta getConsulta() {
+        return consulta;
+    }
+
+    public Prontuario getProntuario() {
+        return prontuario;
+    }
+
+    @Override
+    public String exportarDados() {
+        return "Atendimento | CPF: " + consulta.getCpfPaciente()
+                + " | Prof: " + consulta.getNomeProfissional()
+                + " | Data: " + consulta.getData()
+                + " | " + prontuario.exibirResumo();
     }
 
     public String exibirResumo() {
-        String resumo = "Observacoes: " + observacoes;
-
-        if (!diagnostico.equals("")) {
-            resumo = resumo + "\nDiagnostico: " + diagnostico;
-        }
-
-        if (totalProcedimentos > 0) {
-            resumo = resumo + "\nProcedimentos: ";
-            for (int i = 0; i < totalProcedimentos; i++) {
-                resumo = resumo + procedimentos[i];
-                if (i < totalProcedimentos - 1) {
-                    resumo = resumo + ", ";
-                }
-            }
-        }
-        return resumo;
+        return prontuario.exibirResumo();
     }
 }
